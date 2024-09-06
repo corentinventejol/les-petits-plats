@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- NORMALIZE -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+
+    <!-- STYLE -->
+    <link rel="stylesheet" href="./assets/styles/style.css">
+
+    <script src="./assets/scripts/script.js" defer type="module"></script>
+
+    <title>Les Petits Plats</title>
+</head>
+<body>
+    <header>
+        <img class="header-background-image" src="./assets/images/header.jpg" />
+        <div class="header-logo">
+            <img src="./assets/images/Logo.svg" />
+        </div>
+        <div class="header-search">
+            <h1 class="header-search-title">CHERCHEZ PARMI PLUS DE 1500 RECETTES DU QUOTIDIEN,SIMPLES ET DÉLICIEUSES</h1>
+            <div class="header-search-input">
+                <input type="text" placeholder="Rechercher une recette, un ingredient ...">
+                <button>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="sorter-flex">
+            <div class="sorter">
+                <div class="sorter-item">
+                    <span id="ingredient">Ingrédients<i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="sorter-content" id="content-ingredient">
+                        <!-- Les éléments seront insérés ici via JavaScript -->
+                    </div>
+                </div>
+                <div class="sorter-item">
+                    <span id="appareils">Appareils<i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="sorter-content" id="content-appareils"></div>
+                </div>
+                <div class="sorter-item">
+                    <span id="ustensiles">Ustensiles<i class="fa-solid fa-chevron-down"></i></span>
+                    <div class="sorter-content" id="content-ustensiles"></div>
+                </div>
+            </div>
+            <div class="recipe-number">
+                <p>1500 recettes</p>
+            </div>
+        </div>
+        <section class="card-grid" id="card-grid-container"></section>
+    </main>
+</body>
+</html>
