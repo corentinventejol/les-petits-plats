@@ -1,5 +1,5 @@
 import database from "../scripts/datas/database.js";
-import showSorter, { createSorter } from "../scripts/components/Sorter.js";
+import Sorter from '../scripts/components/Sorter.js'; 
 import displayCard from "../scripts/components/card.js";
 
 const BASE_URL = 'assets/recettes/'; // Base URL des images
@@ -29,23 +29,18 @@ async function displayRecipeCards() {
 
 // Fonction d'initialisation
 async function init() {
-    createSorter(); // Crée la structure HTML de la sorter
+    // Crée des instances de Sorter pour chaque catégorie
+    const ingredientsSorter = new Sorter('Ingrédients', await database.getAllingredients());
+    const appliancesSorter = new Sorter('Appareils', await database.getAllappliance());
+    const ustensilsSorter = new Sorter('Ustensiles', await database.getAllustensils());
 
-    // Écouteurs d'événements pour chaque catégorie
-    document.getElementById('ingredient').addEventListener('click', async function () {
-        const ingredients = await database.getAllingredients();
-        showSorter({ id: 'ingredient' }, ingredients);
-    });
+    // Récupère le conteneur où placer les sorters
+    const sorterContainer = document.querySelector('.sorter');
 
-    document.getElementById('appareils').addEventListener('click', async function () {
-        const appliances = await database.getAllappliance();
-        showSorter({ id: 'appareils' }, appliances);
-    });
-
-    document.getElementById('ustensiles').addEventListener('click', async function () {
-        const ustensils = await database.getAllustensils();
-        showSorter({ id: 'ustensiles' }, ustensils);
-    });
+    // Ajoute les sorters au DOM
+    sorterContainer.appendChild(ingredientsSorter.DOMElement);
+    sorterContainer.appendChild(appliancesSorter.DOMElement);
+    sorterContainer.appendChild(ustensilsSorter.DOMElement);
 
     // Appelle la fonction pour afficher les cartes de recettes
     displayRecipeCards();
