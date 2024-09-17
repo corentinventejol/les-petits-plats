@@ -95,6 +95,7 @@ main {
 .sorter {
     display: flex;
     gap: 20px;
+    max-width: fit-content;
 }
 
 .sorter:hover {
@@ -143,7 +144,7 @@ main {
     overflow-y: auto;
 }
 
-.sorter-content--clicked {
+.sorter--clicked {
     display: block;
 }
 
@@ -266,7 +267,14 @@ main {
     font-size: 14px;
 }
 
-.quantity {
-    color: var(--gray
-    );
+.quantity-unit-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
 }
+
+.quantity,
+.unit {
+    color: var(--gray);
+}
+

@@ -54,18 +54,31 @@ export default function displayCard(image, name, ingredients, time, description)
     ingredients.forEach(ingredient => {
         const ingredientDiv = document.createElement('div');
         ingredientDiv.classList.add('ingredients');
+        
         const ingredientName = document.createElement('span');
         ingredientName.classList.add('ingredient');
         ingredientName.textContent = ingredient.ingredient;
+
+        // Création d'une div pour entourer la quantité et l'unité
+        const quantityUnitDiv = document.createElement('div');
+        quantityUnitDiv.classList.add('quantity-unit-container');
+        
         const ingredientQuantity = document.createElement('span');
         ingredientQuantity.classList.add('quantity');
         ingredientQuantity.textContent = ingredient.quantity ? ingredient.quantity : '';
+
         const ingredientUnit = document.createElement('span');
         ingredientUnit.classList.add('unit');
         ingredientUnit.textContent = ingredient.unit ? ingredient.unit : '';
-        
+
+        // Ajout de la quantité et de l'unité dans leur conteneur
+        quantityUnitDiv.appendChild(ingredientQuantity);
+        quantityUnitDiv.appendChild(ingredientUnit);
+
+        // Ajout des éléments dans l'ingrédient
         ingredientDiv.appendChild(ingredientName);
-        ingredientDiv.appendChild(ingredientQuantity);
+        ingredientDiv.appendChild(quantityUnitDiv);
+
         ingredientsGrid.appendChild(ingredientDiv);
     });
     

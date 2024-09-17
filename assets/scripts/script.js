@@ -1,5 +1,5 @@
 import database from "../scripts/datas/database.js";
-import showSorter from "../scripts/components/Sorter.js";
+import showSorter, { createSorter } from "../scripts/components/Sorter.js";
 import displayCard from "../scripts/components/card.js";
 
 const BASE_URL = 'assets/recettes/'; // Base URL des images
@@ -27,21 +27,29 @@ async function displayRecipeCards() {
     });
 }
 
-// Écouteurs d'événements pour chaque catégorie
-document.getElementById('ingredient').addEventListener('click', async function () {
-    const ingredients = await database.getAllingredients();
-    showSorter(this, ingredients);
-});
+// Fonction d'initialisation
+async function init() {
+    createSorter(); // Crée la structure HTML de la sorter
 
-document.getElementById('appareils').addEventListener('click', async function () {
-    const appliances = await database.getAllappliance();
-    showSorter(this, appliances);
-});
+    // Écouteurs d'événements pour chaque catégorie
+    document.getElementById('ingredient').addEventListener('click', async function () {
+        const ingredients = await database.getAllingredients();
+        showSorter({ id: 'ingredient' }, ingredients);
+    });
 
-document.getElementById('ustensiles').addEventListener('click', async function () {
-    const ustensils = await database.getAllustensils();
-    showSorter(this, ustensils);
-});
+    document.getElementById('appareils').addEventListener('click', async function () {
+        const appliances = await database.getAllappliance();
+        showSorter({ id: 'appareils' }, appliances);
+    });
 
-// Appelle la fonction pour afficher les cartes de recettes au chargement
-document.addEventListener('DOMContentLoaded', displayRecipeCards);
+    document.getElementById('ustensiles').addEventListener('click', async function () {
+        const ustensils = await database.getAllustensils();
+        showSorter({ id: 'ustensiles' }, ustensils);
+    });
+
+    // Appelle la fonction pour afficher les cartes de recettes
+    displayRecipeCards();
+}
+
+// Appelle la fonction d'initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', init);
