@@ -104,14 +104,18 @@ main {
 
 .sorter-item {
     max-width: 194px;
+    position: relative;
 }
 
 .sorter span {
+    display: inline-block;
     font-family: "Manrope", sans-serif;
     font-size: 16px;
     background-color: white;
     padding: 15px;
     border-radius: 10px;
+    width: 100%; /* Définit la largeur du span pour s'aligner avec la div */
+    box-sizing: border-box; /* S'assure que le padding est inclus dans la largeur totale */
 }
 
 .sorter i {
@@ -136,17 +140,22 @@ main {
 .sorter-content {
     display: none;
     flex-direction: column;
-    margin-top: 5px;
+    margin-top: -6px;
     background-color: white;
     padding: 15px;
     border-radius: 0 0 10px 10px;
     max-height: 170px;
     overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+    position: absolute; 
+    z-index: 10; /* Assure que le dropdown reste au-dessus des autres éléments */
 }
 
 .sorter--clicked {
     display: block;
 }
+
 
 .sorter-content p {
     font-family: "Manrope";

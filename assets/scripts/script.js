@@ -6,7 +6,7 @@ const BASE_URL = 'assets/recettes/'; // Base URL des images
 
 // Fonction pour afficher les cartes de recette
 async function displayRecipeCards() {
-    const recipes = await database.getAllRecipes(); // Assure-toi que cette méthode existe et retourne des données
+    const recipes = await database.getAllRecipes(); 
     const container = document.getElementById('card-grid-container'); // Utilise l'ID du conteneur
 
     // Vide le conteneur avant d'ajouter les nouvelles cartes
@@ -17,7 +17,7 @@ async function displayRecipeCards() {
         const cardElement = displayCard(
             BASE_URL + recipe.image, // Concaténation de la base URL avec le chemin relatif
             recipe.name,  // Nom de la recette
-            recipe.ingredients, // Liste des ingrédients (doit être un tableau d'objets avec `name` et `quantity`)
+            recipe.ingredients, // Liste des ingrédients 
             recipe.time,  // Temps de préparation
             recipe.description // Description de la recette
         );

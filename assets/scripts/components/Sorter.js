@@ -23,18 +23,10 @@ export default class Sorter {
         contentDiv.id = `content-${this.id}`;
         sorterItem.appendChild(contentDiv);
 
-        // Ajout des éléments du dropdown
-        this.items.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('sorter-item');
-            itemDiv.textContent = item;
-            contentDiv.appendChild(itemDiv);
-        });
-
         // Ajout de l'événement de clic pour afficher ou cacher le contenu
         labelElement.addEventListener('click', () => {
             this.clicked = !this.clicked; // Inverse l'état de clic
-            
+
             // Ajoute ou retire la classe 'sorter--clicked' en fonction de l'état
             if (this.clicked) {
                 contentDiv.classList.add('sorter--clicked');
@@ -42,6 +34,37 @@ export default class Sorter {
                 contentDiv.classList.remove('sorter--clicked');
             }
         });
+
+        // Ajoute un champ de recherche
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.classList.add('sorter-search');
+        contentDiv.appendChild(searchInput);
+
+        // Conteneur pour les éléments filtrés
+        const itemsContainer = document.createElement('div');
+        itemsContainer.classList.add('items-container');
+        contentDiv.appendChild(itemsContainer);
+
+        // Fonction pour afficher les éléments filtrés
+        const displayItems = (filteredItems) => {
+            itemsContainer.innerHTML = ''; // Vide les éléments précédents
+            filteredItems.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = item;
+                itemsContainer.appendChild(p);
+            });
+        };
+
+        // Affiche tous les éléments au départ
+        displayItems(this.items);
+
+        // Filtre les éléments en fonction de la saisie
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.toLowerCase();
+            const filteredItems = this.items.filter(item => item.toLowerCase().includes(query));
+            displayItems(filteredItems);
+        }.bind(this)); // Liaison du contexte pour accéder à `this.items`
 
         return sorterItem;
     }
