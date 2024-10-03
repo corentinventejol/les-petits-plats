@@ -64,6 +64,17 @@ header {
     border-radius: 8px 0 0 8px;
     border: none;
   }
+
+  .clear-search {
+    display: block;
+    font-size: 20px;
+    padding-right: 10px;
+    color: var(--gray);
+  }
+
+  .cross-hidden {
+    display: none;
+  }
   
   .header-search-input button {
     border-radius: 5px;
@@ -122,6 +133,12 @@ main {
     margin-left: 63px;
 }
 
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .sorter-search {
     margin-bottom: 10px;
     padding: 5px;
@@ -129,6 +146,15 @@ main {
     border-radius: 5px;
     width: 100%;
     box-sizing: border-box;
+}
+
+.clear-input {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    cursor: pointer;
+    color: var(--gray);
+    z-index: 1;
 }
 
 .items-container {
@@ -144,12 +170,12 @@ main {
     background-color: white;
     padding: 15px;
     border-radius: 0 0 10px 10px;
-    max-height: 170px;
+    max-height: 250px;
     overflow-y: auto;
     width: 100%;
     box-sizing: border-box;
     position: absolute; 
-    z-index: 10; /* Assure que le dropdown reste au-dessus des autres éléments */
+    z-index: 10; 
 }
 
 .sorter--clicked {
@@ -161,7 +187,25 @@ main {
     font-family: "Manrope";
     padding-bottom: 5px;
     margin: 5px 0;
+}
+
+.sorter p:hover {
+    background-color: var(--orange);
     cursor: pointer;
+}
+
+.tag-container {
+    display: flex;
+    gap: 20px;
+}
+
+.showTag {
+    background-color: var(--orange);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px 10px;
+    gap: 80px;
 }
 
 .recipe-number {

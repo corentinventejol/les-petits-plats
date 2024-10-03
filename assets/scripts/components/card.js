@@ -1,4 +1,4 @@
-export default function displayCard(image, name, ingredients, time, description) {
+export default function displayCard(image, name, ingredients, time, description, recipeId) {
     // Création de l'élément principal
     const card = document.createElement('article');
     card.classList.add('card');
@@ -59,7 +59,6 @@ export default function displayCard(image, name, ingredients, time, description)
         ingredientName.classList.add('ingredient');
         ingredientName.textContent = ingredient.ingredient;
 
-        // Création d'une div pour entourer la quantité et l'unité
         const quantityUnitDiv = document.createElement('div');
         quantityUnitDiv.classList.add('quantity-unit-container');
         
@@ -71,11 +70,9 @@ export default function displayCard(image, name, ingredients, time, description)
         ingredientUnit.classList.add('unit');
         ingredientUnit.textContent = ingredient.unit ? ingredient.unit : '';
 
-        // Ajout de la quantité et de l'unité dans leur conteneur
         quantityUnitDiv.appendChild(ingredientQuantity);
         quantityUnitDiv.appendChild(ingredientUnit);
 
-        // Ajout des éléments dans l'ingrédient
         ingredientDiv.appendChild(ingredientName);
         ingredientDiv.appendChild(quantityUnitDiv);
 
@@ -85,14 +82,12 @@ export default function displayCard(image, name, ingredients, time, description)
     ingredientsContainer.appendChild(ingredientsTitle);
     ingredientsContainer.appendChild(ingredientsGrid);
     
-    // Ajout des éléments à la section des métadonnées
     divMetasData.appendChild(title);
     divMetasData.appendChild(recipeFlex);
     divMetasData.appendChild(ingredientsContainer);
     
     divMetas.appendChild(divMetasData);
     
-    // Ajout de la section image et des métadonnées à la carte
     card.appendChild(divImg);
     card.appendChild(divMetas);
     
