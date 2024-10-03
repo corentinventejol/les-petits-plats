@@ -1,55 +1,50 @@
-export default class StateFilter {
+class StateFilter {
     constructor() {
-        this.state = {
-            ingredients: [],
-            appliances: [],
-            ustensils: [],
-            filteredRecipes: [] // Ajouter pour garder la trace des recettes filtrées
-        };
+        this.input = '';  // Valeur de la recherche
+        this.ingredients = []; // Liste des ingrédients sélectionnés
+        this.appliances = []; // Liste des appareils sélectionnés
+        this.ustensils = []; // Liste des ustensiles sélectionnés
     }
 
-    updateState(newState) {
-        this.state = {
-            ...this.state,
-            ...newState
-        };
+    addFilter(type, value) {
+        switch(type) {
+            case 'ingredients':
+                if (!this.ingredients.includes(value)) {
+                    this.ingredients.push(value);
+                }
+                break;
+            case 'appliances':
+                if (!this.appliances.includes(value)) {
+                    this.appliances.push(value);
+                }
+                break;
+            case 'ustensils':
+                if (!this.ustensils.includes(value)) {
+                    this.ustensils.push(value);
+                }
+                break;
+            default:
+                console.error('Type de filtre non reconnu');
+        }
+        console.log('État du state après ajout :', this);
     }
 
-    getState() {
-        return this.state;
-    }
-
-    // Ajouter une méthode pour définir les recettes filtrées
-    setFilteredRecipes(recipes) {
-        this.state.filteredRecipes = recipes;
-    }
-
-    // Obtenez les recettes filtrées
-    getFilteredRecipes() {
-        return this.state.filteredRecipes;
-    }
-
-    addIngredient(ingredient) {
-        this.state.ingredients.push(ingredient);
-    }
-
-    removeIngredient(ingredient) {
-        this.state.ingredients = this.state.ingredients.filter(i => i !== ingredient);
-    }
-
-    addAppliance(appliance) {
-        this.state.appliances.push(appliance);
-    }
-
-    removeAppliance(appliance) {
-        this.state.appliances = this.state.appliances.filter(a => a !== appliance);
-    }
-
-    addUstensil(ustensil) {
-        this.state.ustensils.push(ustensil);
-    }
-
-    removeUstensil(ustensil) {
-        this.state.ustensils = this.state.ustensils.filter(u => u !== ustensil);
+    removeFilter(type, value) {
+        switch(type) {
+            case 'ingredients':
+                this.ingredients = this.ingredients.filter(ingredient => ingredient !== value);
+                break;
+            case 'appliances':
+                this.appliances = this.appliances.filter(appliance => appliance !== value);
+                break;
+            case 'ustensils':
+                this.ustensils = this.ustensils.filter(ustensil => ustensil !== value);
+                break;
+            default:
+                console.error('Type de filtre non reconnu');
+        }
+        console.log('État actuel après suppression :', this);
     }
 }
+
+export default StateFilter;

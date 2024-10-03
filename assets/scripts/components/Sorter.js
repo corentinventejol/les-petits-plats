@@ -1,5 +1,5 @@
 export default class Sorter {
-    constructor(label, items, id, tagContainer) {
+    constructor(label, items, id, tagContainer, stateFilter) {
         this.label = label;
         this.items = items;
         this.id = id;
@@ -7,6 +7,7 @@ export default class Sorter {
         this.tagContainer = document.querySelector(tagContainer);
         this.filteredItems = [...items];
         this.removedItems = {};
+        this.stateFilter = stateFilter; // Référence à l'état global des filtres
         this.DOMElement = this.createDropdown();
     }
 
@@ -47,7 +48,7 @@ export default class Sorter {
         // Ajout de l'icône croix à droite (initialement cachée)
         const clearIcon = document.createElement('i');
         clearIcon.classList.add('fa-solid', 'fa-x', 'clear-input');
-        clearIcon.classList.add('cross-hidden')
+        clearIcon.classList.add('cross-hidden');
         inputWrapper.appendChild(clearIcon);
 
         // Événement pour vider le champ de recherche lorsque l'icône est cliquée
@@ -72,6 +73,9 @@ export default class Sorter {
                     this.createTag(item);
                     p.remove();
                     this.filteredItems = this.filteredItems.filter(i => i !== item);
+
+                    // Ajoute l'élément au filtre global et au tableau des items sélectionnés
+                    this.stateFilter.addFilter(this.id, item);
                 });
                 itemsContainer.appendChild(p);
             });
@@ -87,9 +91,9 @@ export default class Sorter {
 
             // Ajouter ou supprimer la classe 'cross-hidden' en fonction du contenu de l'input
             if (searchInput.value.length > 0) {
-                clearIcon.classList.remove('cross-hidden'); // Cacher la croix si l'input est vide
+                clearIcon.classList.remove('cross-hidden'); // Afficher la croix si l'input n'est pas vide
             } else {
-                clearIcon.classList.add('cross-hidden'); // Afficher la croix si l'input n'est pas vide 
+                clearIcon.classList.add('cross-hidden'); // Cacher la croix si l'input est vide
             }
         }.bind(this));
 
@@ -117,6 +121,9 @@ export default class Sorter {
             this.filteredItems.splice(originalIndex, 0, tagText);
             delete this.removedItems[tagText];
             this.updateDropdown();
+
+            // Retirer l'élément du filtre global et du tableau des items sélectionnés
+            this.stateFilter.removeFilter(this.id, tagText);
         });
 
         tagDiv.appendChild(removeBtn);

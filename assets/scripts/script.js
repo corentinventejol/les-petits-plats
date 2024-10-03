@@ -1,21 +1,24 @@
 import database from "../scripts/datas/database.js";
-import Sorter from '../scripts/components/Sorter.js'; 
+import Sorter from '../scripts/components/Sorter.js';
 import displayCard from "../scripts/components/card.js";
+import StateFilter from "./state/stateFilter.js";
 
 const BASE_URL = 'assets/recettes/'; // Base URL des images
+const stateFilter = new StateFilter(); // Instance de StateFilter
 
 // Fonction pour afficher les cartes de recette
 async function displayRecipeCards(searchValue = '') {
-    const recipes = await database.getAllRecipes(); 
+    const recipes = await database.getAllRecipes();
     const container = document.getElementById('card-grid-container'); // Utilise l'ID du conteneur
     const recipeNumberElement = document.querySelector('.recipe-number p'); // Sélectionner l'élément qui affiche le nombre de recettes
 
     // Vide le conteneur avant d'ajouter les nouvelles cartes
     container.innerHTML = '';
 
-    // Filtrer les recettes en fonction de la recherche
+    // Filtrer les recettes en fonction de la recherche et des filtres
     const filteredRecipes = recipes.filter(recipe => 
-        searchValue.length < 3 || matchRecipe(recipe, searchValue)
+        (searchValue.length < 3 || matchRecipe(recipe, searchValue)) &&
+        matchFilters(recipe)
     );
 
     // Mettre à jour le nombre de recettes affichées
@@ -41,24 +44,34 @@ async function displayRecipeCards(searchValue = '') {
     }
 }
 
+// Fonction pour matcher une recette avec les filtres sélectionnés
+function matchFilters(recipe) {
+    const matchesIngredients = stateFilter.ingredients.length === 0 || 
+        stateFilter.ingredients.every(ingredient => 
+            recipe.ingredients.some(rIng => rIng.ingredient.toLowerCase().includes(ingredient.toLowerCase()))
+        );
+    
+    const matchesAppliances = stateFilter.appliances.length === 0 || 
+        stateFilter.appliances.includes(recipe.appliance.toLowerCase());
+
+    const matchesUstensils = stateFilter.ustensils.length === 0 || 
+        stateFilter.ustensils.every(ustensil => 
+            recipe.ustensils.some(rUst => rUst.toLowerCase().includes(ustensil.toLowerCase()))
+        );
+
+    return matchesIngredients && matchesAppliances && matchesUstensils;
+}
+
 // Fonction pour matcher une recette avec la recherche
 function matchRecipe(recipe, searchValue) {
-    const lowerSearch = searchValue.toLowerCase();
-
-    const matchesName = recipe.name.toLowerCase().includes(lowerSearch);
-    const matchesDescription = recipe.description.toLowerCase().includes(lowerSearch);
-    const matchesIngredients = recipe.ingredients.some(ingredient => 
-        ingredient.ingredient.toLowerCase().includes(lowerSearch)
-    );
-
-    return matchesName || matchesDescription || matchesIngredients;
+    return recipe.name.toLowerCase().includes(searchValue.toLowerCase());
 }
 
 // Fonction d'initialisation
 async function init() {
-    const ingredientsSorter = new Sorter('Ingrédients', await database.getAllingredients(), 'ingredients', '.tag-container');
-    const appliancesSorter = new Sorter('Appareils', await database.getAllappliance(), 'appliances', '.tag-container');
-    const ustensilsSorter = new Sorter('Ustensiles', await database.getAllustensils(), 'ustensils', '.tag-container');
+    const ingredientsSorter = new Sorter('Ingrédients', await database.getAllIngredients(), 'ingredients', '.tag-container', stateFilter);
+    const appliancesSorter = new Sorter('Appareils', await database.getAllAppliances(), 'appliances', '.tag-container', stateFilter);
+    const ustensilsSorter = new Sorter('Ustensiles', await database.getAllUstensils(), 'ustensils', '.tag-container', stateFilter);
 
     const sorterContainer = document.querySelector('.sorter');
 
@@ -76,6 +89,7 @@ async function init() {
 
     searchInput.addEventListener('input', () => {
         const searchValue = searchInput.value.trim();
+        stateFilter.input = searchValue; // Mettre à jour l'état avec la valeur de recherche
         displayRecipeCards(searchValue);
 
         // Afficher la croix si la valeur n'est pas vide
