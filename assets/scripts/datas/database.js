@@ -47,4 +47,4 @@ function removeDuplicatesIgnoreCase(array) {
     });
 }
 
-export default { getAllRecipes, getAllIngredients, getAllAppliances, getAllUstensils };
+export default { getAllRecipes, getAllIngredients, getAllAppliances, getAllUstensils, recipes };

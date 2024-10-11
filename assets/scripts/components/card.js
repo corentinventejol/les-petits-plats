@@ -1,4 +1,4 @@
-export default function displayCard(image, name, ingredients, time, description, recipeId) {
+export default function displayCard(image, name, ingredients, time, description) {
     // Création de l'élément principal
     const card = document.createElement('article');
     card.classList.add('card');

@@ -1,14 +1,20 @@
+import database from "../datas/database.js";
+
 export default class Sorter {
     constructor(label, items, id, tagContainer, stateFilter) {
         this.label = label;
         this.items = items;
         this.id = id;
+        this.recipes = database.recipes;
         this.clicked = false;
         this.tagContainer = document.querySelector(tagContainer);
         this.filteredItems = [...items];
         this.removedItems = {};
         this.stateFilter = stateFilter; // Référence à l'état global des filtres
         this.DOMElement = this.createDropdown();
+        
+        // console.log('recipes:', this.recipes);
+        // console.log('filtered:', this.stateFilter);
     }
 
     createDropdown() {
@@ -77,6 +83,7 @@ export default class Sorter {
                     // Ajoute l'élément au filtre global et au tableau des items sélectionnés
                     this.stateFilter.addFilter(this.id, item);
                 });
+
                 itemsContainer.appendChild(p);
             });
         };
