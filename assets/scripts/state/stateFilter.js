@@ -27,25 +27,37 @@ class StateFilter {
 
     // Ajoute un filtre selon le type
     addFilter(type, value) {
+        let added = false; // Variable pour suivre si l'élément a été ajouté
+
         switch(type) {
             case 'ingredients':
                 if (!this.ingredients.includes(value)) {
                     this.ingredients.push(value);
+                    added = true;
                 }
                 break;
             case 'appliances':
                 if (!this.appliances.includes(value)) {
                     this.appliances.push(value);
+                    added = true;
                 }
                 break;
             case 'ustensils':
                 if (!this.ustensils.includes(value)) {
                     this.ustensils.push(value);
+                    added = true;
                 }
                 break;
             default:
                 console.error('Type de filtre non reconnu');
         }
+
+        if (added) {
+            console.log(`${value} ajouté aux filtres ${type}.`);
+        } else {
+            console.log(`${value} est déjà dans les filtres ${type}.`);
+        }
+
         this.notifyListeners(); // Appelle les fonctions liées
     }
 
@@ -65,21 +77,6 @@ class StateFilter {
                 console.error('Type de filtre non reconnu');
         }
         this.notifyListeners(); // Appelle les fonctions liées
-    }
-
-    // Méthode pour filtrer les recettes
-    async filterRecipes() {
-        const allRecipes = await getAllRecipes();
-        return allRecipes.filter(recipe => {
-            const matchesInput = this.input ? recipe.name.toLowerCase().includes(this.input.toLowerCase()) : true;
-            const matchesIngredients = this.ingredients.length ? this.ingredients.every(ingredient => 
-                recipe.ingredients.some(item => item.ingredient.toLowerCase() === ingredient.toLowerCase())) : true;
-            const matchesAppliances = this.appliances.length ? this.appliances.includes(recipe.appliance.toLowerCase()) : true;
-            const matchesUstensils = this.ustensils.length ? this.ustensils.every(ustensil => 
-                recipe.ustensils.map(u => u.toLowerCase()).includes(ustensil.toLowerCase())) : true;
-
-            return matchesInput && matchesIngredients && matchesAppliances && matchesUstensils;
-        });
     }
 }
 

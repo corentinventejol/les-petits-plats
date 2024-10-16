@@ -1,4 +1,5 @@
 import database from "../datas/database.js";
+import { activeCards } from "../script.js";
 
 export default class Sorter {
     constructor(label, items, id, tagContainer, stateFilter) {
@@ -12,9 +13,13 @@ export default class Sorter {
         this.removedItems = {};
         this.stateFilter = stateFilter; // Référence à l'état global des filtres
         this.DOMElement = this.createDropdown();
+
+        // Variables pour stocker les éléments disponibles
+        this.availableIngredients = [];
+        this.availableAppliances = [];
+        this.availableUstensils = [];
         
-        // console.log('recipes:', this.recipes);
-        // console.log('filtered:', this.stateFilter);
+        console.log('active cards sorter', activeCards);
     }
 
     createDropdown() {
@@ -33,38 +38,30 @@ export default class Sorter {
 
         labelElement.addEventListener('click', () => {
             this.clicked = !this.clicked;
-            if (this.clicked) {
-                contentDiv.classList.add('sorter--clicked');
-            } else {
-                contentDiv.classList.remove('sorter--clicked');
-            }
+            contentDiv.classList.toggle('sorter--clicked', this.clicked);
         });
 
-        // Conteneur pour l'input et l'icône croix
         const inputWrapper = document.createElement('div');
         inputWrapper.classList.add('input-wrapper');
         contentDiv.appendChild(inputWrapper);
 
-        // Ajout du champ de recherche
         const searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.classList.add('sorter-search');
         inputWrapper.appendChild(searchInput);
 
-        // Ajout de l'icône croix à droite (initialement cachée)
         const clearIcon = document.createElement('i');
-        clearIcon.classList.add('fa-solid', 'fa-x', 'clear-input');
-        clearIcon.classList.add('cross-hidden');
+        clearIcon.classList.add('fa-solid', 'fa-x', 'clear-input', 'cross-hidden');
         inputWrapper.appendChild(clearIcon);
 
-        // Événement pour vider le champ de recherche lorsque l'icône est cliquée
         clearIcon.addEventListener('click', () => {
             searchInput.value = '';
-            searchInput.dispatchEvent(new Event('input')); // Pour mettre à jour la liste après suppression
+            searchInput.dispatchEvent(new Event('input')); // Met à jour la liste après suppression
         });
 
         const itemsContainer = document.createElement('div');
         itemsContainer.classList.add('items-container');
+        itemsContainer.id = this.id;
         contentDiv.appendChild(itemsContainer);
 
         const displayItems = (filteredItems) => {
@@ -74,14 +71,7 @@ export default class Sorter {
                 p.textContent = item;
                 p.classList.add('dropdown-item');
                 p.addEventListener('click', () => {
-                    const index = this.filteredItems.indexOf(item);
-                    this.removedItems[item] = index;
-                    this.createTag(item);
-                    p.remove();
-                    this.filteredItems = this.filteredItems.filter(i => i !== item);
-
-                    // Ajoute l'élément au filtre global et au tableau des items sélectionnés
-                    this.stateFilter.addFilter(this.id, item);
+                    this.handleItemClick(item, p);
                 });
 
                 itemsContainer.appendChild(p);
@@ -90,21 +80,30 @@ export default class Sorter {
 
         displayItems(this.items);
 
-        // Événement de saisie dans le champ de recherche
-        searchInput.addEventListener('input', function () {
+        searchInput.addEventListener('input', () => {
             const query = searchInput.value.toLowerCase();
             const filteredItems = this.filteredItems.filter(item => item.toLowerCase().includes(query));
             displayItems(filteredItems);
 
-            // Ajouter ou supprimer la classe 'cross-hidden' en fonction du contenu de l'input
-            if (searchInput.value.length > 0) {
-                clearIcon.classList.remove('cross-hidden'); // Afficher la croix si l'input n'est pas vide
-            } else {
-                clearIcon.classList.add('cross-hidden'); // Cacher la croix si l'input est vide
-            }
-        }.bind(this));
+            clearIcon.classList.toggle('cross-hidden', searchInput.value.length === 0);
+            this.updateAvailableItems(); // Met à jour les éléments disponibles à chaque entrée
+        });
 
         return sorterItem;
+    }
+
+    handleItemClick(item, element) {
+        const index = this.filteredItems.indexOf(item);
+        this.removedItems[item] = index;
+        this.createTag(item);
+        element.remove();
+        this.filteredItems = this.filteredItems.filter(i => i !== item);
+
+        // Ajoute l'élément au filtre global et au tableau des items sélectionnés
+        this.stateFilter.addFilter(this.id, item);
+
+        // Met à jour les éléments disponibles après sélection
+        this.updateAvailableItems();
     }
 
     createTag(tagText) {
@@ -127,7 +126,10 @@ export default class Sorter {
             const originalIndex = this.removedItems[tagText];
             this.filteredItems.splice(originalIndex, 0, tagText);
             delete this.removedItems[tagText];
+
+            // Met à jour le dropdown après la suppression
             this.updateDropdown();
+            this.updateAvailableItems(); // Met à jour les éléments disponibles lors de la suppression d'un tag
 
             // Retirer l'élément du filtre global et du tableau des items sélectionnés
             this.stateFilter.removeFilter(this.id, tagText);
@@ -137,27 +139,128 @@ export default class Sorter {
         this.tagContainer.appendChild(tagDiv);
     }
 
+    async updateAvailableItems() {
+        const recipes = await database.getAllRecipes(); // Récupérer les recettes
+
+        // Filtrer les recettes en fonction des éléments actuellement sélectionnés dans stateFilter
+        const filteredRecipes = recipes.filter(recipe => {
+            const matchesIngredients = this.stateFilter.ingredients.length === 0 || 
+                recipe.ingredients.some(ingredient => this.stateFilter.ingredients.includes(ingredient.ingredient));
+            const matchesAppliances = this.stateFilter.appliances.length === 0 || 
+                this.stateFilter.appliances.includes(recipe.appliance);
+            const matchesUstensils = this.stateFilter.ustensils.length === 0 || 
+                recipe.ustensils.some(ustensil => this.stateFilter.ustensils.includes(ustensil));
+
+            return matchesIngredients && matchesAppliances && matchesUstensils;
+        });
+
+        // Récupérer les ingrédients, appareils et ustensiles des recettes filtrées
+        this.availableIngredients = Array.from(new Set(filteredRecipes.flatMap(recipe => recipe.ingredients.map(i => i.ingredient))));
+        this.availableAppliances = Array.from(new Set(filteredRecipes.map(recipe => recipe.appliance)));
+        this.availableUstensils = Array.from(new Set(filteredRecipes.flatMap(recipe => recipe.ustensils)));
+
+        // Log pour vérifier les items filtrées
+        console.log("Available Ingredients:", this.availableIngredients);
+        console.log("Available Appliances:", this.availableAppliances);
+        console.log("Available Ustensils:", this.availableUstensils);
+
+        // Mettre à jour les listes disponibles dans le dropdown
+        this.updateDropdown();
+    }
+
     updateDropdown() {
-        const contentDiv = document.getElementById(`content-${this.id}`);
-        const searchInput = contentDiv.querySelector('.sorter-search');
-        const query = searchInput.value.toLowerCase();
+        const itemsContainer = document.querySelector(`#content-${this.id} .items-container`);
+        itemsContainer.innerHTML = ''; // Vide l'ancien contenu
 
-        const filteredItems = this.filteredItems.filter(item => item.toLowerCase().includes(query));
-        const itemsContainer = contentDiv.querySelector('.items-container');
+        // Crée un conteneur pour chaque catégorie
+        const ingredientsContainer = document.createElement('div');
+        ingredientsContainer.classList.add('ingredients-container');
+        const appliancesContainer = document.createElement('div');
+        appliancesContainer.classList.add('appliances-container');
+        const ustensilsContainer = document.createElement('div');
+        ustensilsContainer.classList.add('ustensils-container');
 
-        itemsContainer.innerHTML = '';
-        filteredItems.forEach(item => {
+        // Ajoute les ingrédients disponibles
+        this.availableIngredients.forEach(item => {
             const p = document.createElement('p');
             p.textContent = item;
             p.classList.add('dropdown-item');
             p.addEventListener('click', () => {
-                const index = this.filteredItems.indexOf(item);
-                this.removedItems[item] = index;
-                this.createTag(item);
-                p.remove();
-                this.filteredItems = this.filteredItems.filter(i => i !== item);
+                this.handleItemClick(item, p);
             });
-            itemsContainer.appendChild(p);
+            ingredientsContainer.appendChild(p);
         });
+
+        // Ajoute les appareils disponibles
+        this.availableAppliances.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item;
+            p.classList.add('dropdown-item');
+            p.addEventListener('click', () => {
+                this.handleItemClick(item, p);
+            });
+            appliancesContainer.appendChild(p);
+        });
+
+        // Ajoute les ustensiles disponibles
+        this.availableUstensils.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item;
+            p.classList.add('dropdown-item');
+            p.addEventListener('click', () => {
+                this.handleItemClick(item, p);
+            });
+            ustensilsContainer.appendChild(p);
+        });
+
+        // Ajoute les conteneurs à la liste des éléments
+        itemsContainer.appendChild(ingredientsContainer);
+        itemsContainer.appendChild(appliancesContainer);
+        itemsContainer.appendChild(ustensilsContainer);
     }
+
+    updateItemsList(ingredients, appliances, ustensils) {
+        // Récupère chaque conteneur par son ID (ingredients, appliances, ustensils)
+        const ingredientsContainer = document.getElementById('ingredients');
+        const appliancesContainer = document.getElementById('appliances');
+        const ustensilsContainer = document.getElementById('ustensils');
+    
+        // Vide l'ancien contenu des conteneurs
+        ingredientsContainer.innerHTML = '';
+        appliancesContainer.innerHTML = '';
+        ustensilsContainer.innerHTML = '';
+    
+        // Ajoute les ingrédients disponibles dans le conteneur "ingredients"
+        ingredients.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item;
+            p.classList.add('dropdown-item');
+            p.addEventListener('click', () => {
+                this.handleItemClick(item, p);
+            });
+            ingredientsContainer.appendChild(p);
+        });
+    
+        // Ajoute les appareils disponibles dans le conteneur "appliances"
+        appliances.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item;
+            p.classList.add('dropdown-item');
+            p.addEventListener('click', () => {
+                this.handleItemClick(item, p);
+            });
+            appliancesContainer.appendChild(p);
+        });
+    
+        // Ajoute les ustensiles disponibles dans le conteneur "ustensils"
+        ustensils.forEach(item => {
+            const p = document.createElement('p');
+            p.textContent = item;
+            p.classList.add('dropdown-item');
+            p.addEventListener('click', () => {
+                this.handleItemClick(item, p);
+            });
+            ustensilsContainer.appendChild(p);
+        });
+    }    
 }

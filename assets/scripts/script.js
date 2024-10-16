@@ -1,4 +1,4 @@
-import database from "../scripts/datas/database.js";
+import database from "./datas/database.js";
 import Sorter from '../scripts/components/Sorter.js';
 import displayCard from "../scripts/components/card.js";
 import StateFilter from "./state/stateFilter.js";
@@ -6,17 +6,17 @@ import StateFilter from "./state/stateFilter.js";
 const BASE_URL = 'assets/recettes/'; // Base URL des images
 const stateFilter = new StateFilter(); // Instance de StateFilter
 
+// Créer un tableau pour stocker les cartes actives à un niveau global
+export const activeCards = []; // Exporter le tableau pour qu'il soit accessible ailleurs
+
 // Fonction pour afficher les cartes de recette
 async function displayRecipeCards() {
     const recipes = await database.getAllRecipes();
-    const container = document.getElementById('card-grid-container'); // Utilise l'ID du conteneur
-    const recipeNumberElement = document.querySelector('.recipe-number p'); // Sélectionner l'élément qui affiche le nombre de recettes
+    const container = document.getElementById('card-grid-container'); 
+    const recipeNumberElement = document.querySelector('.recipe-number p');
 
     // Vide le conteneur avant d'ajouter les nouvelles cartes
     container.innerHTML = '';
-
-    // Créer un tableau pour stocker les cartes actives
-    const activeCards = [];
 
     // Filtrer les recettes en fonction de la recherche et des filtres
     const filteredRecipes = recipes.filter(recipe => 
@@ -26,6 +26,9 @@ async function displayRecipeCards() {
 
     // Mettre à jour le nombre de recettes affichées
     recipeNumberElement.textContent = `${filteredRecipes.length} recette(s)`; // Actualise le nombre
+
+    // Réinitialiser activeCards à chaque appel de displayRecipeCards
+    activeCards.length = 0; // Vider le tableau avant d'y ajouter les nouvelles cartes
 
     // Afficher les recettes filtrées
     filteredRecipes.forEach(recipe => {
@@ -45,7 +48,7 @@ async function displayRecipeCards() {
         activeCards.push({
             ingredients: recipe.ingredients.map(ing => ing.ingredient),
             appliance: recipe.appliance,
-            utensils: recipe.utensils,
+            utensils: recipe.ustensils,
         });
     });
 
@@ -56,8 +59,8 @@ async function displayRecipeCards() {
         container.appendChild(message);
     }
 
-    // Vous pouvez maintenant utiliser le tableau activeCards comme bon vous semble
-    console.log('Cartes actives:', activeCards);
+    // console log des cards active 
+    console.log('Cards actives script:', activeCards);
 }
 
 // Fonction pour matcher une recette avec les filtres sélectionnés

@@ -114,7 +114,6 @@ main {
 }
 
 .sorter-item {
-    max-width: 194px;
     position: relative;
 }
 
@@ -182,7 +181,6 @@ main {
 .sorter--clicked {
     display: block;
 }
-
 
 .sorter-content p {
     font-family: "Manrope";

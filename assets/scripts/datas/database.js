@@ -38,7 +38,7 @@ async function getAllRecipes() {
 // Fonction pour supprimer les doublons en ignorant la casse
 function removeDuplicatesIgnoreCase(array) {
     const lowerCaseSet = new Set(array.map(item => item.toLowerCase()));
-    return array.filter((item, index) => {
+    return array.filter((item) => {
         if (lowerCaseSet.has(item.toLowerCase())) {
             lowerCaseSet.delete(item.toLowerCase());
             return true;
