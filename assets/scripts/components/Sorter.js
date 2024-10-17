@@ -169,55 +169,45 @@ export default class Sorter {
     }
 
     updateDropdown() {
+        // Récupère le conteneur lié à l'ID dynamique "content-{this.id}"
         const itemsContainer = document.querySelector(`#content-${this.id} .items-container`);
-        itemsContainer.innerHTML = ''; // Vide l'ancien contenu
-
-        // Crée un conteneur pour chaque catégorie
-        const ingredientsContainer = document.createElement('div');
-        ingredientsContainer.classList.add('ingredients-container');
-        const appliancesContainer = document.createElement('div');
-        appliancesContainer.classList.add('appliances-container');
-        const ustensilsContainer = document.createElement('div');
-        ustensilsContainer.classList.add('ustensils-container');
-
-        // Ajoute les ingrédients disponibles
-        this.availableIngredients.forEach(item => {
-            const p = document.createElement('p');
-            p.textContent = item;
-            p.classList.add('dropdown-item');
-            p.addEventListener('click', () => {
-                this.handleItemClick(item, p);
+        
+        // Vide les anciens éléments
+        itemsContainer.innerHTML = ''; // Supprime les éléments précédents (tous les <p>)
+    
+        // Crée des éléments pour chaque catégorie et les ajoute au conteneur principal
+        if (this.id === 'ingredients') {
+            this.availableIngredients.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = item;
+                p.classList.add('dropdown-item');
+                p.addEventListener('click', () => {
+                    this.handleItemClick(item, p);
+                });
+                itemsContainer.appendChild(p);
             });
-            ingredientsContainer.appendChild(p);
-        });
-
-        // Ajoute les appareils disponibles
-        this.availableAppliances.forEach(item => {
-            const p = document.createElement('p');
-            p.textContent = item;
-            p.classList.add('dropdown-item');
-            p.addEventListener('click', () => {
-                this.handleItemClick(item, p);
+        } else if (this.id === 'appliances') {
+            this.availableAppliances.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = item;
+                p.classList.add('dropdown-item');
+                p.addEventListener('click', () => {
+                    this.handleItemClick(item, p);
+                });
+                itemsContainer.appendChild(p);
             });
-            appliancesContainer.appendChild(p);
-        });
-
-        // Ajoute les ustensiles disponibles
-        this.availableUstensils.forEach(item => {
-            const p = document.createElement('p');
-            p.textContent = item;
-            p.classList.add('dropdown-item');
-            p.addEventListener('click', () => {
-                this.handleItemClick(item, p);
+        } else if (this.id === 'ustensils') {
+            this.availableUstensils.forEach(item => {
+                const p = document.createElement('p');
+                p.textContent = item;
+                p.classList.add('dropdown-item');
+                p.addEventListener('click', () => {
+                    this.handleItemClick(item, p);
+                });
+                itemsContainer.appendChild(p);
             });
-            ustensilsContainer.appendChild(p);
-        });
-
-        // Ajoute les conteneurs à la liste des éléments
-        itemsContainer.appendChild(ingredientsContainer);
-        itemsContainer.appendChild(appliancesContainer);
-        itemsContainer.appendChild(ustensilsContainer);
-    }
+        }
+    }        
 
     updateItemsList(ingredients, appliances, ustensils) {
         // Récupère chaque conteneur par son ID (ingredients, appliances, ustensils)
