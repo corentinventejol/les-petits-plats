@@ -3,11 +3,13 @@ import Sorter from '../scripts/components/Sorter.js';
 import displayCard from "../scripts/components/card.js";
 import StateFilter from "./state/stateFilter.js";
 
-const BASE_URL = 'assets/recettes/'; // Base URL des images
-const stateFilter = new StateFilter(); // Instance de StateFilter
+const BASE_URL = 'assets/recettes/';
+const stateFilter = new StateFilter(handleStateChange); // Passe handleStateChange comme référence directe
 
-// Créer un tableau pour stocker les cartes actives à un niveau global
-export const activeCards = []; // Exporter le tableau pour qu'il soit accessible ailleurs
+export const activeCards = []; // Stocke les cartes actives
+
+// Instances de Sorter pour chaque filtre
+let ingredientFilter, applianceFilter, ustensilsFilter;
 
 // Fonction pour afficher les cartes de recette
 async function displayRecipeCards() {
@@ -15,7 +17,6 @@ async function displayRecipeCards() {
     const container = document.getElementById('card-grid-container'); 
     const recipeNumberElement = document.querySelector('.recipe-number p');
 
-    // Vide le conteneur avant d'ajouter les nouvelles cartes
     container.innerHTML = '';
 
     // Filtrer les recettes en fonction de la recherche et des filtres
@@ -24,11 +25,8 @@ async function displayRecipeCards() {
         matchFilters(recipe)
     );
 
-    // Mettre à jour le nombre de recettes affichées
-    recipeNumberElement.textContent = `${filteredRecipes.length} recette(s)`; // Actualise le nombre
-
-    // Réinitialiser activeCards à chaque appel de displayRecipeCards
-    activeCards.length = 0; // Vider le tableau avant d'y ajouter les nouvelles cartes
+    recipeNumberElement.textContent = `${filteredRecipes.length} recette(s)`;
+    activeCards.length = 0; // Réinitialiser activeCards
 
     // Afficher les recettes filtrées
     filteredRecipes.forEach(recipe => {
@@ -40,7 +38,6 @@ async function displayRecipeCards() {
             recipe.description
         );
 
-        // Ajoute la classe 'active' à la carte
         cardElement.classList.add('active');
         container.appendChild(cardElement);
 
@@ -48,7 +45,7 @@ async function displayRecipeCards() {
         activeCards.push({
             ingredients: recipe.ingredients.map(ing => ing.ingredient),
             appliance: recipe.appliance,
-            utensils: recipe.ustensils,
+            ustensils: recipe.ustensils,
         });
     });
 
@@ -59,7 +56,7 @@ async function displayRecipeCards() {
         container.appendChild(message);
     }
 
-    // console log des cards active 
+    // Log des cartes actives pour vérifier leur contenu
     console.log('Cards actives script:', activeCards);
 }
 
@@ -85,49 +82,100 @@ function matchFilters(recipe) {
 function matchRecipe(recipe, searchValue) {
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
-    // Vérifie si la recherche correspond au titre
     const matchesTitle = recipe.name.toLowerCase().includes(lowerCaseSearchValue);
-
-    // Vérifie si la recherche correspond à la description
     const matchesDescription = recipe.description.toLowerCase().includes(lowerCaseSearchValue);
-
-    // Vérifie si la recherche correspond à un ingrédient
     const matchesIngredients = recipe.ingredients.some(ingredient => 
         ingredient.ingredient.toLowerCase().includes(lowerCaseSearchValue)
     );
 
-    // Retourne vrai si la recherche correspond à l'un des trois critères
     return matchesTitle || matchesDescription || matchesIngredients;
+}
+
+// Fonction pour mettre à jour les dropdowns en fonction des cartes actives
+function triggerState() {
+    console.log("triggerState est appelé");
+
+    // Extraire les ingrédients, appareils, et ustensiles uniques des cartes actives
+    const activeIngredients = [...new Set(activeCards.flatMap(card => card.ingredients))];
+    const activeAppliances = [...new Set(activeCards.map(card => card.appliance))];
+    const activeUstensils = [...new Set(activeCards.flatMap(card => card.ustensils))];
+
+    console.log("Ingrédients actifs :", activeIngredients);
+    console.log("Appareils actifs :", activeAppliances);
+    console.log("Ustensiles actifs :", activeUstensils);
+
+    // Vérifier que les instances de filtre sont bien définies
+    if (ingredientFilter && applianceFilter && ustensilsFilter) {
+        ingredientFilter.updateItems(activeIngredients);
+        applianceFilter.updateItems(activeAppliances);
+        ustensilsFilter.updateItems(activeUstensils);
+        console.log("Les dropdowns ont été mis à jour avec les éléments actifs.");
+    } else {
+        console.log("Les filtres ne sont pas définis correctement.");
+    }
+}
+
+// Gère les changements d'état pour actualiser les cartes et les dropdowns dans le bon ordre
+async function handleStateChange() {
+    await displayRecipeCards();   // Assure que les cartes sont mises à jour
+    triggerState();               // Ensuite, met à jour les dropdowns
 }
 
 // Fonction d'initialisation
 async function init() {
-    const ingredientsSorter = new Sorter('Ingrédients', await database.getAllIngredients(), 'ingredients', '.tag-container', stateFilter);
-    const appliancesSorter = new Sorter('Appareils', await database.getAllAppliances(), 'appliances', '.tag-container', stateFilter);
-    const ustensilsSorter = new Sorter('Ustensiles', await database.getAllUstensils(), 'ustensils', '.tag-container', stateFilter);
+    const ingredients = await database.getAllIngredients();
+    const appliances = await database.getAllAppliances();
+    const ustensils = await database.getAllUstensils();
 
-    const sorterContainer = document.querySelector('.sorter');
+    ingredientFilter = new Sorter(
+        'Ingrédients',
+        ingredients,
+        'ingredients',
+        '.tag-container',
+        stateFilter,
+        (ingredient) => stateFilter.addIngredient(ingredient),
+        (ingredient) => stateFilter.deleteIngredient(ingredient)
+    );
 
-    sorterContainer.appendChild(ingredientsSorter.DOMElement);
-    sorterContainer.appendChild(appliancesSorter.DOMElement);
-    sorterContainer.appendChild(ustensilsSorter.DOMElement);
+    applianceFilter = new Sorter(
+        'Appareils',
+        appliances,
+        'appliances',
+        '.tag-container',
+        stateFilter,
+        (appliance) => stateFilter.addAppliance(appliance),
+        (appliance) => stateFilter.deleteAppliance(appliance)
+    );
 
-    // Mettre à jour la liste des recettes au chargement et à chaque changement du state
-    stateFilter.addListener(displayRecipeCards);
-    displayRecipeCards();
+    ustensilsFilter = new Sorter(
+        'Ustensiles',
+        ustensils,
+        'ustensils',
+        '.tag-container',
+        stateFilter,
+        (ustensils) => stateFilter.addUstensil(ustensils),
+        (ustensils) => stateFilter.deleteUstensil(ustensils)
+    );
+
+    document.querySelector('.sorter').appendChild(ingredientFilter.DOMElement);
+    document.querySelector('.sorter').appendChild(applianceFilter.DOMElement);
+    document.querySelector('.sorter').appendChild(ustensilsFilter.DOMElement);
+
+    // Ajoute handleStateChange en tant qu'écouteur pour les changements d'état
+    stateFilter.addListener(handleStateChange);
+
+    // Appelle l'affichage initial des recettes
+    await displayRecipeCards();
 
     const searchInput = document.querySelector('.header-search-input input[type="text"]');
     const crossIcon = document.querySelector('.header-search-input .fas.fa-times');
 
-    // Vider la valeur de recherche au chargement de la page
     searchInput.value = '';
 
-    // Mettre à jour l'état et les cartes lorsque la recherche change
     searchInput.addEventListener('input', () => {
         const searchValue = searchInput.value.trim();
         stateFilter.updateSearchInput(searchValue);
 
-        // Afficher la croix si la valeur n'est pas vide
         if (searchValue.length > 0) {
             crossIcon.classList.remove('cross-hidden');
         } else {
@@ -135,12 +183,8 @@ async function init() {
         }
     });
 
-    // Écouter le clic sur la croix pour réinitialiser la recherche
     crossIcon.addEventListener('click', () => {
-        // Vider le champ de recherche
         searchInput.value = '';
-
-        // Réinitialiser l'état de recherche
         stateFilter.updateSearchInput('');
         crossIcon.classList.add('cross-hidden');
     });
