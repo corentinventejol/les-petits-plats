@@ -120,7 +120,8 @@ export default class Sorter {
         const itemsContainer = document.querySelector(`#content-${this.id} .items-container`);
         itemsContainer.innerHTML = '';
 
-        this.filteredItems.forEach(item => {
+        for (let i = 0; i < this.filteredItems.length; i++) {
+            const item = this.filteredItems[i];
             const p = document.createElement('p');
             p.textContent = item;
             p.classList.add('dropdown-item');
@@ -128,7 +129,7 @@ export default class Sorter {
                 this.handleItemClick(item, p);
             });
             itemsContainer.appendChild(p);
-        });
+        }
     }
 
     // Nouvelle méthode pour mettre à jour les éléments

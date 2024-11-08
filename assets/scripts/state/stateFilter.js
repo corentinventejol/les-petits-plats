@@ -15,7 +15,9 @@ class StateFilter {
 
     // Notifie tous les listeners d'un changement de state
     notifyListeners() {
-        this.listeners.forEach(callback => callback());
+        for (let i = 0; i < this.listeners.length; i++) {
+            this.listeners[i]();
+        }
         this.triggerState(); // Appelle triggerState après avoir notifié les listeners
     }
 
@@ -29,7 +31,6 @@ class StateFilter {
     addIngredient(value) {
         if (!this.ingredients.includes(value)) {
             this.ingredients.push(value);
-            console.log(`${value} ajouté aux filtres ingrédients.`);
             this.notifyListeners(); // Notifie les changements
         }
     }
@@ -38,7 +39,6 @@ class StateFilter {
     addAppliance(value) {
         if (!this.appliances.includes(value)) {
             this.appliances.push(value);
-            console.log(`${value} ajouté aux filtres appareils.`);
             this.notifyListeners(); // Notifie les changements
         }
     }
@@ -47,7 +47,6 @@ class StateFilter {
     addUstensil(value) {
         if (!this.ustensils.includes(value)) {
             this.ustensils.push(value);
-            console.log(`${value} ajouté aux filtres ustensiles.`);
             this.notifyListeners(); // Notifie les changements
         }
     }
