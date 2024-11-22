@@ -54,21 +54,18 @@ class StateFilter {
     // Supprime un ingrédient
     deleteIngredient(value) {
         this.ingredients = this.ingredients.filter(ingredient => ingredient !== value);
-        console.log(`${value} retiré des filtres ingrédients.`);
         this.notifyListeners(); // Notifie les changements
     }
 
     // Supprime un appareil
     deleteAppliance(value) {
         this.appliances = this.appliances.filter(appliance => appliance !== value);
-        console.log(`${value} retiré des filtres appareils.`);
         this.notifyListeners(); // Notifie les changements
     }
 
     // Supprime un ustensile
     deleteUstensil(value) {
         this.ustensils = this.ustensils.filter(ustensil => ustensil !== value);
-        console.log(`${value} retiré des filtres ustensiles.`);
         this.notifyListeners(); // Notifie les changements
     }
 }

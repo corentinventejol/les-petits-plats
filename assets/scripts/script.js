@@ -55,9 +55,6 @@ async function displayRecipeCards() {
         message.textContent = `Aucune recette ne contient ‘${stateFilter.input}’. Vous pouvez chercher « tarte aux pommes », « poisson », etc.`;
         container.appendChild(message);
     }
-
-    // Log des cartes actives pour vérifier leur contenu
-    console.log('Cards actives script:', activeCards);
 }
 
 // Fonction pour matcher une recette avec les filtres sélectionnés
@@ -93,25 +90,17 @@ function matchRecipe(recipe, searchValue) {
 
 // Fonction pour mettre à jour les dropdowns en fonction des cartes actives
 function triggerState() {
-    console.log("triggerState est appelé");
 
     // Extraire les ingrédients, appareils, et ustensiles uniques des cartes actives
     const activeIngredients = [...new Set(activeCards.flatMap(card => card.ingredients))];
     const activeAppliances = [...new Set(activeCards.map(card => card.appliance))];
     const activeUstensils = [...new Set(activeCards.flatMap(card => card.ustensils))];
 
-    console.log("Ingrédients actifs :", activeIngredients);
-    console.log("Appareils actifs :", activeAppliances);
-    console.log("Ustensiles actifs :", activeUstensils);
-
     // Vérifier que les instances de filtre sont bien définies
     if (ingredientFilter && applianceFilter && ustensilsFilter) {
         ingredientFilter.updateItems(activeIngredients);
         applianceFilter.updateItems(activeAppliances);
         ustensilsFilter.updateItems(activeUstensils);
-        console.log("Les dropdowns ont été mis à jour avec les éléments actifs.");
-    } else {
-        console.log("Les filtres ne sont pas définis correctement.");
     }
 }
 
