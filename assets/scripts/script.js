@@ -20,16 +20,20 @@ async function displayRecipeCards() {
     container.innerHTML = '';
 
     // Filtrer les recettes en fonction de la recherche et des filtres
-    const filteredRecipes = recipes.filter(recipe => 
-        (stateFilter.input.length < 3 || matchRecipe(recipe, stateFilter.input)) &&
-        matchFilters(recipe)
-    );
+    const filteredRecipes = [];
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        if ((stateFilter.input.length < 3 || matchRecipe(recipe, stateFilter.input)) && matchFilters(recipe)) {
+            filteredRecipes.push(recipe);
+        }
+    }
 
     recipeNumberElement.textContent = `${filteredRecipes.length} recette(s)`;
     activeCards.length = 0; // Réinitialiser activeCards
 
     // Afficher les recettes filtrées
-    filteredRecipes.forEach(recipe => {
+    for (let i = 0; i < filteredRecipes.length; i++) {
+        const recipe = filteredRecipes[i];
         const cardElement = displayCard(
             BASE_URL + recipe.image,
             recipe.name,
@@ -47,7 +51,7 @@ async function displayRecipeCards() {
             appliance: recipe.appliance,
             ustensils: recipe.ustensils,
         });
-    });
+    }
 
     // Afficher le message si aucune recette ne correspond
     if (filteredRecipes.length === 0) {
@@ -92,9 +96,26 @@ function matchRecipe(recipe, searchValue) {
 function triggerState() {
 
     // Extraire les ingrédients, appareils, et ustensiles uniques des cartes actives
-    const activeIngredients = [...new Set(activeCards.flatMap(card => card.ingredients))];
-    const activeAppliances = [...new Set(activeCards.map(card => card.appliance))];
-    const activeUstensils = [...new Set(activeCards.flatMap(card => card.ustensils))];
+    const activeIngredients = [];
+    const activeAppliances = [];
+    const activeUstensils = [];
+
+    for (let i = 0; i < activeCards.length; i++) {
+        const card = activeCards[i];
+        for (let j = 0; j < card.ingredients.length; j++) {
+            if (!activeIngredients.includes(card.ingredients[j])) {
+                activeIngredients.push(card.ingredients[j]);
+            }
+        }
+        if (!activeAppliances.includes(card.appliance)) {
+            activeAppliances.push(card.appliance);
+        }
+        for (let k = 0; k < card.ustensils.length; k++) {
+            if (!activeUstensils.includes(card.ustensils[k])) {
+                activeUstensils.push(card.ustensils[k]);
+            }
+        }
+    }
 
     // Vérifier que les instances de filtre sont bien définies
     if (ingredientFilter && applianceFilter && ustensilsFilter) {

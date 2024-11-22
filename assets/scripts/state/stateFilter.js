@@ -53,19 +53,37 @@ class StateFilter {
 
     // Supprime un ingrédient
     deleteIngredient(value) {
-        this.ingredients = this.ingredients.filter(ingredient => ingredient !== value);
+        const newIngredients = [];
+        for (let i = 0; i < this.ingredients.length; i++) {
+            if (this.ingredients[i] !== value) {
+                newIngredients.push(this.ingredients[i]);
+            }
+        }
+        this.ingredients = newIngredients;
         this.notifyListeners(); // Notifie les changements
     }
 
     // Supprime un appareil
     deleteAppliance(value) {
-        this.appliances = this.appliances.filter(appliance => appliance !== value);
+        const newAppliances = [];
+        for (let i = 0; i < this.appliances.length; i++) {
+            if (this.appliances[i] !== value) {
+                newAppliances.push(this.appliances[i]);
+            }
+        }
+        this.appliances = newAppliances;
         this.notifyListeners(); // Notifie les changements
     }
 
     // Supprime un ustensile
     deleteUstensil(value) {
-        this.ustensils = this.ustensils.filter(ustensil => ustensil !== value);
+        const newUstensils = [];
+        for (let i = 0; i < this.ustensils.length; i++) {
+            if (this.ustensils[i] !== value) {
+                newUstensils.push(this.ustensils[i]);
+            }
+        }
+        this.ustensils = newUstensils;
         this.notifyListeners(); // Notifie les changements
     }
 }

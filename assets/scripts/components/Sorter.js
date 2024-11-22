@@ -54,7 +54,8 @@ export default class Sorter {
 
         const displayItems = (filteredItems) => {
             itemsContainer.innerHTML = '';
-            filteredItems.forEach(item => {
+            for (let i = 0; i < filteredItems.length; i++) {
+                const item = filteredItems[i];
                 const p = document.createElement('p');
                 p.textContent = item;
                 p.classList.add('dropdown-item');
@@ -63,14 +64,19 @@ export default class Sorter {
                 });
 
                 itemsContainer.appendChild(p);
-            });
+            }
         };
 
         displayItems(this.items);
 
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.toLowerCase();
-            const filteredItems = this.filteredItems.filter(item => item.toLowerCase().includes(query));
+            const filteredItems = [];
+            for (let i = 0; i < this.filteredItems.length; i++) {
+                if (this.filteredItems[i].toLowerCase().includes(query)) {
+                    filteredItems.push(this.filteredItems[i]);
+                }
+            }
             displayItems(filteredItems);
 
             clearIcon.classList.toggle('cross-hidden', searchInput.value.length === 0);
@@ -81,7 +87,13 @@ export default class Sorter {
 
     handleItemClick(item) {
         this.removedItems[item] = this.filteredItems.indexOf(item);
-        this.filteredItems = this.filteredItems.filter(i => i !== item);
+        const newFilteredItems = [];
+        for (let i = 0; i < this.filteredItems.length; i++) {
+            if (this.filteredItems[i] !== item) {
+                newFilteredItems.push(this.filteredItems[i]);
+            }
+        }
+        this.filteredItems = newFilteredItems;
 
         this.createTag(item);
         this.addElement(item);
